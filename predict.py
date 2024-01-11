@@ -75,26 +75,31 @@ class Predictor(BasePredictor):
 
         print(f"Running prediction: {predict_id}...")
 
-        annotated_picture_mask, neg_annotated_picture_mask, mask, inverted_mask = run_grounding_sam(image,
+
+
+        annotated_picture_mask, neg_annotated_picture_mask, bw_mask_image, inverted_mask = run_grounding_sam(image,
                                                                                                     mask_prompt,
                                                                                                     negative_mask_prompt,
                                                                                                     self.groundingdino_model,
                                                                                                     self.sam_predictor,
                                                                                                     adjustment_factor)
         print("Done!")
-
+        
         variable_dict = {
             'annotated_picture_mask': annotated_picture_mask,
             'neg_annotated_picture_mask': neg_annotated_picture_mask,
-            'mask': mask,
+            'bw_mask_image': bw_mask_image,  # Renommé pour clarté
             'inverted_mask': inverted_mask
         }
-
+        
         output_dir = "/tmp/" + predict_id
         os.makedirs(output_dir, exist_ok=True)  # create directory if it doesn't exist
-
+        
         for var_name, img in variable_dict.items():
-            random_filename = output_dir + "/" + var_name + ".jpg"
-            rgb_img = img.convert('RGB')  # Converting image to RGB
-            rgb_img.save(random_filename)
-            yield Path(random_filename)
+            random_filename = output_dir + "/" + var_name + ".png"  # Utilisation de .png pour la transparence et les masques
+            if var_name == 'bw_mask_image':  # Si c'est l'image du masque noir et blanc
+                img.save(random_filename)  # Pas besoin de convertir, enregistrez directement
+            else:
+                rgb_img = img.convert('RGB')  # Converting image to RGB for color images
+                rgb_img.save(random_filename)
+            yield Path(random_filename)  # Yield the path of the saved file
