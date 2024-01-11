@@ -77,7 +77,7 @@ class Predictor(BasePredictor):
 
 
 
-        annotated_picture_mask, neg_annotated_picture_mask, bw_mask_image, inverted_mask = run_grounding_sam(image,
+        annotated_picture_mask, neg_annotated_picture_mask, bw_mask_image, inverted_mask = run_grounding_sam_mask(image,
                                                                                                     mask_prompt,
                                                                                                     negative_mask_prompt,
                                                                                                     self.groundingdino_model,
